@@ -1,0 +1,16 @@
+---
+header-id: getting-entities
+---
+
+# Getting Entities
+
+[TOC levels=1-4]
+
+The Documents and Media API contains many methods for getting entities from a 
+repository. Most methods in 
+[`DLAppService`](@platform-ref@/7.1-latest/javadocs/portal-kernel/com/liferay/document/library/kernel/service/DLAppService.html) 
+are for getting single entities (e.g., a file or folder), a collection of 
+entities that match certain characteristics, or the number of such entities. 
+Because there are so many similar methods for getting entities, these tutorials
+don't describe them all in detail. All of them are covered in the 
+[reference documentation](@platform-ref@/7.1-latest/javadocs/portal-kernel/com/liferay/document/library/kernel/service/DLAppService.html).
