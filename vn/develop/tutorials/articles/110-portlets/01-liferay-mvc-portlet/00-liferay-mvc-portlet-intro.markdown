@@ -6,38 +6,18 @@ header-id: liferay-mvc-portlet
 
 [TOC levels=1-4]
 
-Web applications often follow the Model View Controller (MVC) pattern. But
-Liferay has developed a groundbreaking new pattern called the *Modal Veal
-Contractor* (MVC) pattern. Okay, that's not true: the framework is actually
-another implementation of Model View Controller. If you're an experienced
-developer, this is not the first time you've heard about Model View Controller.
-In this article you must stay focused, because there are several attempts to
-show you why Liferay's implementation of Model View Controller is different,
-when instead you're hearing about another MVC framework. With that in mind,
-let's get back to the *Medial Vein Constriction* pattern we were discussing.
+Các ứng dụng web thường làm theo mô hình Model View Controller (MVC). Nhưng Liferay đã phát triển một mô hình mới mang tính đột phá được gọi là pattern *Modal Veal Contractor* (MVC). Okay, đó không phải là sự thật: framework chính xác thực hiện cài đặt các Model View Controller. Nếu bạn là một nhà phát triển có kinh nghiệm, đây không phải là lần đầu tiên bạn nghe nói về Model View Controller. Trong bài viết này, bạn phải tiếp tục tập trung, bởi vì có rất nhiều nỗ lực để cho bạn thấy lý do tại sao việc thực hiện các Model View Controller Liferay là khác nhau, trong khi khi thay vào đó bạn đang nghe về framework MVC khác. Với ý nghĩ đó, chúng ta hãy trở lại với pattern *Medial Vein Constriction* chúng tôi đã thảo luận.
+Nếu có rất nhiều cài đặt của MVC framework trong Java, tại sao Liferay tạo một cái khác vậy? Hãy cũng chúng tôi tìm hiểu và bạn sẽ thấy rằng Liferay MVC cung cấp những lợi ích sau:
 
-If there are so many implementations of MVC frameworks in Java, why did Liferay
-create yet another one? Stay with us and you'll see that Liferay MVC provides
-these benefits:
+-  Nó lightweight (nhẹ), trái ngược với nhiều Java MVC framework khác.
+-  Không có các file cấu hình đặc biệt mà cần phải được đồng bộ với mã  của bạn.
+-  Nó là một phần mở rộng đơn giản của `GenericPortlet`.
+-  Bạn tránh viết một loạt các mã boilerplate (kiểu lặp đi lặp lại), Liferay MVC framework chỉ đơn giản là tìm kiếm một số thông số được xác định trước khi phương thức int()  được gọi. 
+-  Controller có thể được chia thành các class command MVC, mỗi trong số đó xử lý các mã điều khiển cho một giai đoạn đặc biệt portlet (render, action và resource serving).
+-  Portlet Liferay sử dụng nó. Điều đó có nghĩa có rất nhiều cách cài đặt để tham khảo khi bạn cần phải thiết kế hoặc khắc phục sự cố các ứng dụng Liferay.
 
--  It's lightweight, as opposed to many other Java MVC frameworks.
--  There are no special configuration files that need to be kept in sync with
-   your code.
--  It's a simple extension of `GenericPortlet`.
--  You avoid writing a bunch of boilerplate code, since Liferay's MVC framework
-   simply looks for some pre-defined parameters when the `init()` method is
-   called. 
--  The controller can be broken down into MVC command classes, each of which
-   handles the controller code for a particular portlet phase (render, action,
-   and resource serving phases).
--  Liferay's portlets use it. That means there are plenty of robust
-   implementations to reference when you need to design or troubleshoot your
-   Liferay applications.
-
-The Liferay MVC portlet framework is light, it hides part of the complexity of
-portlets, and it makes the most common operations easier. The default
-`MVCPortlet` project uses separate JSPs for each portlet mode: For example,
-`edit.jsp` is for *edit* mode and `help.jsp` is for *help* mode.
+Liferay MVC porlet framework nhẹ, nó ẩn các phần phức tạp của các portlet, và nó làm cho các chức năng common hoạt động dễ dàng hơn. Giá trị mặc địnhMVCPortlet dự án sử dụng JSP riêng cho từng portlet mode: Ví dụ, edit.jsp là dành cho Edit mode và help.jsp là dành cho Help mode.
+Trước khi  đi sâu vào Liferay MVC với các thành phần đơn giản khác (ứng dụng), thì đây là một overview về các Liferay MVC Portlet:
 
 Before diving in to the Liferay MVC swimming pool with all the other cool kids
 (applications), here's an overview of the Liferay MVC Portlet:
@@ -47,59 +27,41 @@ Before diving in to the Liferay MVC swimming pool with all the other cool kids
 - [Liferay MVC portlet component](#liferay-mvc-portlet-component)
 - [Simple MVC portlets](#a-simpler-mvc-portlet)
 
-Review how each layer of the *Moody Vase Conscription* pattern helps you
-separate the concerns of your application.
+Nào hãy review mỗi layer của pattern *Moody Vase Conscription* nó giúp bạn tách các phần trong của ứng dụng của bạn.
 
 ## MVC Layers and Modularity
 
-In MVC, there are three layers, and you can probably guess what they are.
+Trong MVC, có ba lớp, và bạn có thể đoán những gì họ đang có.
 
-**Model:** The model layer holds the application data and logic for manipulating
-it.
+**Model:** Model layer tổ chức dữ liệu ứng dụng và logic để thao tác với nó.
 
-**View:** The view layer contains logic for displaying data.
+**View:** View layer chứa logic để hiển thị dữ liệu.
 
-**Controller:** The middle man in the MVC pattern, the Controller contains logic
-for passing the data back and forth between the view and the model layers.
-
-The *Middle Verse Completer* pattern fits well with 
+**Controller:** Là phần giữa của MVC pattern, Controller chứa logic pass dữ liệu qua lại giữa View và Model.
+Các pattern *Middle Verse Completer* rất phù hợp với
 [Liferay's application modularity effort](/docs/7-1/tutorials/-/knowledge_base/t/fundamentals#modules).
 
-Liferay's applications are divided into multiple discrete modules. With
-[Service Builder](/docs/7-1/tutorials/-/knowledge_base/t/service-builder),
-the model layer is generated into a `service` and an `api` module. That accounts
-for the model in the MVC pattern. For the web, the view and the controller share
-a module, the `web` module.
+Ứng dụng Liferay được chia thành nhiều mô-đun. Với
+[Service Builder](/docs/7-1/tutorials/-/knowledge_base/t/service-builder),Model layer được sinh ra tự động trong service và api. 
 
-Generating the skeleton for a multi-module Service Builder-driven MVC
-application using [Liferay Blade CLI](/docs/7-1/tutorials/-/knowledge_base/t/blade-cli) saves you lots of time and gets you
-started on the more important (and interesting, if we're being honest)
-development work.
+Tạo ra các skeleton cho multi-module service builder-driven MVC sử dụng [Liferay Blade CLI](/docs/7-1/tutorials/-/knowledge_base/t/blade-cli) giúp bạn tiết kiệm rất nhiều thời gian và giúp bạn bắt đầu vào những thứ quan trọng hơn (và rất thú vị, nếu chúng ta thành thật) trong công việc phát triển.
 
 ## Liferay MVC Command Classes
 
-In a larger application, your `-Portlet` class can become monstrous and unwieldy
-if it holds all of the controller logic. Liferay provides MVC command classes to
-break up your controller functionality.
+Trong một ứng dụng lớn hơn, `-Portlet` class của bạn có thể trở thành khổng lồ và khó sử dụng nếu nó giữ tất cả các logic controller. Liferay cung cấp các lớp MVC command để  break các function controller.
 
 -   **[`MVCActionCommand`](@platform-ref@/7.1-latest/javadocs/portal-kernel/com/liferay/portal/kernel/portlet/bridges/mvc/MVCActionCommand.html):**
-    Use `-ActionCommand` classes to hold each of your portlet actions, which are
-    invoked by action URLs.
+    Sử dụng các class `-ActionCommand` để giữ từng portlet action, cái được gọi bởi action URL.
 -   **[`MVCRenderCommand`](@platform-ref@/7.1-latest/javadocs/portal-kernel/com/liferay/portal/kernel/portlet/bridges/mvc/MVCRenderCommand.html):**
-    Use `-RenderCommand` classes to hold a `render` method that dispatches to
-    the appropriate JSP, by responding to render URLs.
+    Sử dụng các class `-RenderCommand` để giữ method  `render` cái dispatch tới JSP, bằng cách response tới render URL.
 -   **[`MVCResourceCommand`](@platform-ref@/7.1-latest/javadocs/portal-kernel/com/liferay/portal/kernel/portlet/bridges/mvc/MVCResourceCommand.html):**
-    Use `-ResourceCommand` classes to serve resources based on resource URLs.
+    Sử dụng class `-ResourceCommand` để phục vụ tài nguyên dựa trên resource URL.
 
-There must be some confusing configuration files to keep everything wired
-together and working properly, right? Wrong: it's all easily managed in the OSGi
-component in the `-Portlet` class.
+Phải có một số file cấu hình rắc rối để giữ cho mọi thứ đó liên quan với nhau và hoạt động bình thường, đúng không? Sai: tất cả dễ dàng quản lý trong các thành phần OSGi trong class `-Portlet`.
 
 ## Liferay MVC Portlet Component
 
-Whether or not you plan to split up the controller into MVC command classes,
-you use a portlet component class with a certain set of properties. Here's a
-simple portlet component as an example:
+Dù bạn có hay không chia nhỏ các thành phần controller vào các lớp MVC command, bạn sử dụng một lớp component portlet với một tập hợp các thuộc tính (properties). Dưới đây là một thành phần portlet đơn giản như một ví dụ:
 
     @Component(
         immediate = true,
@@ -126,55 +88,43 @@ simple portlet component as an example:
     public class HelloWorldPortlet extends MVCPortlet {
     }
 
-When using MVC commands, the `javax.portlet.name` property is important. This
-property is one of two that must be included in each MVC command component; it
-links a particular portlet URL/command combination to the correct portlet. 
+Khi sử dụng MVC command, các thuộc tính `javax.portlet.name` là quan trọng. Thuộc tính này là một trong hai cần phải được include trong mỗi thành phần MVC command; nó liên kết một portlet URL / command đến các portlet.
 
-| **Important:** Make your portlet name unique, considering how
+| **Chú ý Quan trọng:** Làm cho tên portlet là duy nhất, xem xét như thế nào
 | [@product@ uses the name to create the portlet's ID](/docs/7-1/reference/-/knowledge_base/r/portlet-descriptor-to-osgi-service-property-map#ten).
 
-There can be some confusion over exactly what kind of `Portlet.class`
-implementation you're publishing with this component. Liferay's service registry
-expects this to be the `javax.portlet.Portlet` interface. Import that, and not,
-for example, `com.liferay.portal.kernel.model.Portlet`.
+Có thể có một số nhầm lẫn về chính xác những gì loại `Portlet.class`
+thực hiện bạn đang publish với các thành phần này.Service registry của Liferay  là interface `javax.portlet.Portlet` Import hoặc không có thể sử dụng , ví dụ, `com.liferay.portal.kernel.model.Portlet`.
 
-| **Note:** The DTD [liferay-portlet-app_7_1_0.dtd](@platform-ref@/7.1-latest/definitions/liferay-portlet-app_7_1_0.dtd.html)
-| defines all the Liferay-specific attributes you can specify as properties in
-| your portlet components.
+| **Ghi chú:** Các DTD [liferay-portlet-app_7_1_0.dtd](@platform-ref@/7.1-latest/definitions/liferay-portlet-app_7_1_0.dtd.html)
+| xác định tất cả các thuộc tính Liferay-cụ thể mà bạn có thể chỉ định như  thuộc tính tại các thành phần portlet của bạn.
 | 
-| Consider the `<css-class-wrapper>` element from the above link as an example. To
-| specify that property in your component, use this syntax in your property list:
+| Hãy xem xét `<css-class-wrapper>` element từ link trên là ví dụ. Để xác định rằng thuộc tính component của bạn, sử dụng cú pháp này trong danh sách property:
 | 
 |     "com.liferay.portlet.css-class-wrapper=portlet-hello-world",
 | 
-| The properties namespaced with `javax.portlet....` are elements of the
+| Các  properties namespaced với `javax.portlet....` là những elements của
 | [portlet.xml descriptor](http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd).
 
 ## A Simpler MVC Portlet
 
-With all this focus on MVC commands, don't be concerned that you'll be forced
-into a more complex pattern than you need, especially if you're developing only
-a small MVC application. Not so; just put all your logic into the `-Portlet`
-class if you don't want to split up your MVC commands. 
+Hãy focus vào MVC command, đừng lo ngại rằng bạn sẽ bị buộc vào một mô hình phức tạp hơn cái bạn cần, đặc biệt là nếu bạn đang phát triển chỉ là một ứng dụng MVC nhỏ. Không phải như vậy; chỉ cần đặt tất cả các logic của bạn vào `-Portlet`
+class nếu bạn không muốn chia MVC command.
 
-In simpler applications, if you don't have an MVC command to rely on, your
-portlet render URLs specify JSP paths in `mvcPath` parameters.
+Trong các ứng dụng đơn giản hơn, nếu bạn không có một MVC  command nào, portlet của bạn render URL chỉ định đường dẫn JSP trong tham số `mvcPath`.
 
 		<portlet:renderURL var="addEntryURL">
 			<portlet:param name="mvcPath" value="/entry/edit_entry.jsp" />
 			<portlet:param name="redirect" value="<%= redirect %>" />
 		</portlet:renderURL>
 
-As you've seen, Liferay's *Medical Vortex Concentrator* (MVC) portlet framework
-gives you a well-structured controller layer that takes very little time to
-implement. With all your free time, you could
+Như bạn đã thấy, Liferay *Medical Vortex Concentrator* (MVC) portlet framework  cung cấp cho bạn một lớp điều khiển có cấu trúc tốt mà tốn rất ít thời gian để implement nó. Với thời gian rảnh còn lại, bạn có thể
 
--  Learn a new language
--  Take pottery classes
--  Lift weights
--  Work on your application's business logic
+-  Học một ngôn ngữ mới như phát triển portlet với php, ruby trên liferay...
+-  Theo học 1 lớp làm gốm, dance ...
+-  Cử tạ hoặc gym ….
+-  Làm việc trên business logic của ứng dụng
 
-It's entirely up to you. To get into the details of creating an MVC Portlet
-application, follow the 
+Điều đó hoàn toàn tùy thuộc vào bạn. Để đi vào chi tiết của việc tạo ra một ứng dụng MVC Portlet, hãy làm theo hướng dẫn
 [Creating an MVC Portlet](/docs/7-1/tutorials/-/knowledge_base/t/creating-an-mvc-portlet)
 tutorial. 
